@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "deploy:dev": "serverless deploy --stage dev"
+    "deploy": "serverless deploy --stage dev"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.114",
