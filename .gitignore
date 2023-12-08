@@ -7,5 +7,7 @@ node_modules
 
 .DS_Store
 
-.env
-slack-app-manifest.yaml
+.env*
+!.env-template
+slack-app-manifest*
+!slack-app-manifest-template.yaml

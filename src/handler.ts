@@ -4,13 +4,14 @@ import {
   AwsEvent,
 } from "@slack/bolt/dist/receivers/AwsLambdaReceiver"
 import Lambda from "aws-lambda"
-import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from "openai"
+import OpenAI from "openai"
+import { ChatCompletionMessageParam } from "openai/src/resources/chat/completions"
 
 const SYSTEM_MESSAGE_PREFIX = ":writing_hand:"
 const SLACK_SIGNING_SECRET = process.env.SLACK_SIGNING_SECRET
 const SLACK_BOT_USER_OAUTH_TOKEN = process.env.SLACK_BOT_USER_OAUTH_TOKEN
 const SLACK_BOT_MEMBER_ID = process.env.SLACK_BOT_MEMBER_ID
-const OPENAI_RESOURCE_GROUP = process.env.OPENAI_RESOURCE_GROUP
+const OPENAI_RESOURCE = process.env.OPENAI_RESOURCE
 const OPENAI_MODEL_DEPLOY_NAME = process.env.OPENAI_MODEL_DEPLOY_NAME
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY
 const OPENAI_API_VERSION = process.env.OPENAI_API_VERSION
@@ -24,10 +25,12 @@ const app = new App({
   receiver,
 })
 
-const configuration = new Configuration({
-  basePath: `https://${OPENAI_RESOURCE_GROUP}.openai.azure.com/openai/deployments/${OPENAI_MODEL_DEPLOY_NAME}`,
+const openai = new OpenAI({
+  apiKey: OPENAI_API_KEY,
+  baseURL: `https://${OPENAI_RESOURCE}.openai.azure.com/openai/deployments/${OPENAI_MODEL_DEPLOY_NAME}`,
+  defaultQuery: { "api-version": OPENAI_API_VERSION },
+  defaultHeaders: { "api-key": OPENAI_API_KEY },
 })
-const openAiApi = new OpenAIApi(configuration)
 
 app.event("app_mention", async ({ event, context, client, say }) => {
   if (context.retryNum) {
@@ -51,9 +54,9 @@ app.event("app_mention", async ({ event, context, client, say }) => {
     ts: timestamp,
   })
 
-  const requestMessages: ChatCompletionRequestMessage[] =
+  const requestMessages: ChatCompletionMessageParam[] =
     replies.messages?.reduce(
-      (messages: ChatCompletionRequestMessage[], message) => {
+      (messages: ChatCompletionMessageParam[], message) => {
         const { text, user } = message
         if (!text) return messages
 
@@ -79,19 +82,11 @@ app.event("app_mention", async ({ event, context, client, say }) => {
     ) ?? []
 
   try {
-    const completion = await openAiApi.createChatCompletion(
-      {
-        model: OPENAI_MODEL_DEPLOY_NAME ?? "",
-        messages: requestMessages,
-      },
-      {
-        headers: {
-          "api-key": OPENAI_API_KEY ?? "",
-        },
-        params: { "api-version": OPENAI_API_VERSION ?? "" },
-      }
-    )
-    const outputText = completion.data.choices
+    const completion = await openai.chat.completions.create({
+      messages: requestMessages,
+      model: OPENAI_MODEL_DEPLOY_NAME ?? "",
+    })
+    const outputText = completion.choices
       .map(({ message }) => message?.content ?? "")
       .join("")
     await client.chat.postMessage({

@@ -5,7 +5,7 @@ Lambda function to communicate with ChatGPT (Azure) on Slack.
 ## Setup Azure OpenAI Service
 - Enable and create [Azure OpenAI](https://portal.azure.com/#view/Microsoft_Azure_ProjectOxford/CognitiveServicesHub/~/OpenAI)
   - Resource group will be used part of API endpoint
-- Deploy model gpt-35-turbo
+- Deploy model (gpt-35-turbo, gpt-4 and anything you want to use)
   - Model deploy name will be used part of API endpoint
 
 ## Deploy serverless resources
