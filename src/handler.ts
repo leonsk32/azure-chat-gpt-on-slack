@@ -11,8 +11,8 @@ const SYSTEM_MESSAGE_PREFIX = ":writing_hand:"
 const SLACK_SIGNING_SECRET = process.env.SLACK_SIGNING_SECRET
 const SLACK_BOT_USER_OAUTH_TOKEN = process.env.SLACK_BOT_USER_OAUTH_TOKEN
 const SLACK_BOT_MEMBER_ID = process.env.SLACK_BOT_MEMBER_ID
-const OPENAI_RESOURCE = process.env.OPENAI_RESOURCE
-const OPENAI_MODEL_DEPLOY_NAME = process.env.OPENAI_MODEL_DEPLOY_NAME
+const OPENAI_RESOURCE_NAME = process.env.OPENAI_RESOURCE_NAME
+const OPENAI_MODEL_DEPLOYMENT_NAME = process.env.OPENAI_MODEL_DEPLOYMENT_NAME
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY
 const OPENAI_API_VERSION = process.env.OPENAI_API_VERSION
 
@@ -27,7 +27,7 @@ const app = new App({
 
 const openai = new OpenAI({
   apiKey: OPENAI_API_KEY,
-  baseURL: `https://${OPENAI_RESOURCE}.openai.azure.com/openai/deployments/${OPENAI_MODEL_DEPLOY_NAME}`,
+  baseURL: `https://${OPENAI_RESOURCE_NAME}.openai.azure.com/openai/deployments/${OPENAI_MODEL_DEPLOYMENT_NAME}`,
   defaultQuery: { "api-version": OPENAI_API_VERSION },
   defaultHeaders: { "api-key": OPENAI_API_KEY },
 })
@@ -84,7 +84,7 @@ app.event("app_mention", async ({ event, context, client, say }) => {
   try {
     const completion = await openai.chat.completions.create({
       messages: requestMessages,
-      model: OPENAI_MODEL_DEPLOY_NAME ?? "",
+      model: OPENAI_MODEL_DEPLOYMENT_NAME ?? "",
     })
     const outputText = completion.choices
       .map(({ message }) => message?.content ?? "")
