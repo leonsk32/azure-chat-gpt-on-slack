@@ -11,11 +11,8 @@ module.exports = {
     project: ["tsconfig.json"],
   },
   rules: {
-    // 除外ルール
     "@typescript-eslint/no-empty-function": "off",
-    // 追加ルール
     "@typescript-eslint/no-floating-promises": "error",
-    // prettier 設定
     "prettier/prettier": ["error"],
   },
   ignorePatterns: ["**/*.js"],
