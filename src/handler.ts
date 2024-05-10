@@ -43,12 +43,6 @@ app.event("app_mention", async ({ event, context, client, say }) => {
   // thread_ts is undefined when the event is not a thread
   const timestamp = thread_ts ?? event_ts
 
-  await say({
-    channel,
-    thread_ts: timestamp,
-    text: `${SYSTEM_MESSAGE_PREFIX} I'm thinking...`,
-  })
-
   const replies = await client.conversations.replies({
     channel,
     ts: timestamp,
